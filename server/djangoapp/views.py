@@ -120,8 +120,12 @@ def get_dealer_reviews(request,dealer_id):
         reviews = get_request(endpoint)
         # reviews = json.loads(data)
         for rev in reviews:
-            sentiment = analyze_review_sentiments(rev['review'])
-            rev['sentiment'] = sentiment['sentiment']
+            sentiment_response = analyze_review_sentiments(rev['review'])
+            print(sentiment_response)
+            sentiment = ''
+            if (sentiment_response is not None):
+                sentiment = sentiment_response['sentiment']
+            rev['sentiment'] = sentiment
         return JsonResponse({"status": 200, "reviews": reviews})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
