@@ -15,7 +15,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
 from .models import CarMake, CarModel
-from restapis import get_request, analyze_review_sentiments
+from .restapis import get_request, analyze_review_sentiments, post_review
 
 
 # Get an instance of a logger
@@ -116,12 +116,12 @@ def get_dealerships(request, state="All"):
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 def get_dealer_reviews(request,dealer_id):
     if(dealer_id):
-        endpoint = "/fetchReviews/dealer/"+dealer_id
-        data = get_request(endpoint)
-        reviews = json.loads(data)
+        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+        reviews = get_request(endpoint)
+        # reviews = json.loads(data)
         for rev in reviews:
             sentiment = analyze_review_sentiments(rev['review'])
-            rev['sentiment'] = sentiment
+            rev['sentiment'] = sentiment['sentiment']
         return JsonResponse({"status": 200, "reviews": reviews})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
@@ -139,5 +139,15 @@ def get_dealer_details(request, dealer_id):
 # ...
 
 # Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+def add_review(request):
+    #authenticate user check
+    if request.user.is_authenticated:
+        data = json.loads(request.body)
+        try:
+            posted_review = post_review(data)
+            print(posted_review)
+            return JsonResponse({"status": 200, "message": posted_review})
+        except:
+            return JsonResponse({"status": 400, "message": "Error posting review"})
+    else:
+        return JsonResponse({"status": 401, "message": "Unauthorized, please login"})
