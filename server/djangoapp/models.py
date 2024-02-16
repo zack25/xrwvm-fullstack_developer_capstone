@@ -19,10 +19,7 @@ class CarMake(models.Model):
     is_luxury = models.BooleanField(default=False)
 
     def __str__(self):
-        # return "Name: {}\n \
-        #     Description: {}".format(self.name, self.description)
-        return self.name
-
+        return str(self.name)
 
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
@@ -37,27 +34,23 @@ class CarMake(models.Model):
 
 class CarModel(models.Model):
     type_choices = [
-        ('SEDAN','Sedan'),
+        ('SEDAN', 'Sedan'),
         ('SUV', 'SUV'),
         ('WAGON', 'Wagon'),
         ('TRUCK', 'Truck'),
         ('COMPACT', 'Compact'),
 
     ]
-    #make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+
     car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=50)
-    type = models.CharField(max_length=10, choices=type_choices, default='SEDAN')
+    type = models.CharField(
+        max_length=10, choices=type_choices, default='SEDAN')
     year = models.IntegerField(default=2023,
                                validators=[
-                                MinValueValidator(2015),
-                                MaxValueValidator(2023)
+                                   MinValueValidator(2015),
+                                   MaxValueValidator(2023)
                                ])
-    
+
     def __str__(self):
         return str(self.year) + " " + self.name
-        # return 'Make: {} \
-        # Name: {} \
-        # Type: {} \
-        # Year: {}'.format(self.car_make, self.name, self.type, self.year)
-
